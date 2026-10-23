@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="text-primary fw-bold mb-0">Student Strength Report</h3>
+        <p class="text-muted small">Filter and export overall student demographics data.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('reports.student_report', class_id=selected_class_id, export='csv') }}" class="btn btn-success">
+            <i class="bi bi-file-earmark-excel me-1"></i> Export Excel (CSV)
+        </a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <form method="GET" action="" class="row align-items-end">
+            <div class="col-md-6">
+                <label class="form-label fw-bold">Filter by Class</label>
+                <select name="class_id" class="form-select" onchange="this.form.submit()">
+                    <option value="">All Classes</option>
+                    {% for c in classes %}
+                        <option value="{{ c.id }}" {% if selected_class_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Adm No</th>
+                        <th>Student Name</th>
+                        <th>Gender</th>
+                        <th>Class</th>
+                        <th>Guardian</th>
+                        <th>Contact</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in students %}
+                    <tr>
+                        <td><strong>{{ s.admission_number }}</strong></td>
+                        <td>{{ s.first_name }} {{ s.last_name }}</td>
+                        <td>{{ s.gender }}</td>
+                        <td><span class="badge bg-info text-dark">{{ s.course_class.name if s.course_class else 'N/A' }}</span></td>
+                        <td>{{ s.guardian_name or '-' }}</td>
+                        <td>{{ s.contact_number or '-' }}</td>
+                        <td><span class="badge bg-success">{{ s.status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">No student records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

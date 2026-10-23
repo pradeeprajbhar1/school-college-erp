@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <!-- Publish Notice Form -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white fw-bold">Publish New Notice</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="form_type" value="notice"/>
+
+                    <div class="mb-3">
+                        <label class="form-label">Notice Title *</label>
+                        <input type="text" name="title" class="form-control" placeholder="e.g. Mid-Term Examination Schedule Out" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Target Audience *</label>
+                        <select name="target_audience" class="form-select" required>
+                            <option value="All">All (Everyone)</option>
+                            <option value="Students">Students Only</option>
+                            <option value="Teachers">Teachers Only</option>
+                            <option value="Parents">Parents Only</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Notice Details / Content *</label>
+                        <textarea name="content" class="form-control" rows="3" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Expiry Date (Optional)</label>
+                        <input type="date" name="expiry_date" class="form-control">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">
+                        <i class="bi bi-megaphone me-1"></i> Publish Notice
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Event Form -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-success text-white fw-bold">Add Event to School Calendar</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="form_type" value="event"/>
+
+                    <div class="mb-3">
+                        <label class="form-label">Event Name *</label>
+                        <input type="text" name="title" class="form-control" placeholder="e.g. Annual Sports Meet 2026" required>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Event Date *</label>
+                            <input type="date" name="event_date" class="form-control" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Start Time</label>
+                            <input type="text" name="start_time" class="form-control" placeholder="09:00 AM">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Venue / Location</label>
+                        <input type="text" name="venue" class="form-control" placeholder="e.g. Main Auditorium">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 fw-bold">
+                        <i class="bi bi-calendar-event me-1"></i> Add Event
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 text-end mb-3">
+        <a href="{{ url_for('notice.view_notice_board') }}" class="btn btn-outline-primary">
+            <i class="bi bi-eye me-1"></i> View Live Notice Board Grid
+        </a>
+    </div>
+</div>
+{% endblock %}

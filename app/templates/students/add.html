@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="text-primary fw-bold">Add New Student</h3>
+        <a href="{{ url_for('students.index') }}" class="text-decoration-none"><i class="bi bi-arrow-left"></i> Back to Directory</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+        <form method="POST" action="">
+            <!-- CSRF token validation if we use Flask-WTF globally, skipped for raw form for now -->
+
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label">Admission Number *</label>
+                    <input type="text" name="admission_number" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">First Name *</label>
+                    <input type="text" name="first_name" class="form-control" required>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Last Name *</label>
+                    <input type="text" name="last_name" class="form-control" required>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <label class="form-label">Gender</label>
+                    <select name="gender" class="form-select">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <!-- YAHAN SE NAYA CLASS DROPDOWN ADD KIYA HAI -->
+                <div class="col-md-3">
+                    <label class="form-label">Class *</label>
+                    <select name="class_id" class="form-select" required>
+                        <option value="">Select Class...</option>
+                        {% for c in classes %}
+                            <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">Guardian Name</label>
+                    <input type="text" name="guardian_name" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Contact Number</label>
+                    <input type="text" name="contact_number" class="form-control">
+                </div>
+            </div>
+            
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary px-4">Save Student</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

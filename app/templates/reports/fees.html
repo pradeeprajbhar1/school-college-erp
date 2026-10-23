@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="text-primary fw-bold mb-0">Fee Financial Audit Report</h3>
+        <p class="text-muted small">Summary of total assigned, collected, and outstanding fee balances.</p>
+    </div>
+    <div>
+        <a href="{{ url_for('reports.fee_report', export='csv') }}" class="btn btn-success">
+            <i class="bi bi-file-earmark-excel me-1"></i> Export Excel (CSV)
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm bg-primary text-white p-3">
+            <small class="text-uppercase fw-bold opacity-75">Total Fee Assigned</small>
+            <h3 class="fw-bold mb-0">₹{{ total_assigned }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm bg-success text-white p-3">
+            <small class="text-uppercase fw-bold opacity-75">Total Fees Collected</small>
+            <h3 class="fw-bold mb-0">₹{{ total_collected }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm bg-danger text-white p-3">
+            <small class="text-uppercase fw-bold opacity-75">Outstanding Dues</small>
+            <h3 class="fw-bold mb-0">₹{{ total_pending }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Adm No</th>
+                        <th>Student Name</th>
+                        <th>Class</th>
+                        <th>Fee Category</th>
+                        <th>Total Fee</th>
+                        <th>Paid</th>
+                        <th class="text-danger">Pending</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inv in invoices %}
+                    <tr>
+                        <td><strong>{{ inv.student.admission_number }}</strong></td>
+                        <td>{{ inv.student.first_name }} {{ inv.student.last_name }}</td>
+                        <td>{{ inv.student.course_class.name if inv.student.course_class else 'N/A' }}</td>
+                        <td>{{ inv.category.name }}</td>
+                        <td>₹{{ inv.amount }}</td>
+                        <td class="text-success fw-bold">₹{{ inv.paid_amount }}</td>
+                        <td class="text-danger fw-bold">₹{{ inv.amount - inv.paid_amount }}</td>
+                        <td>
+                            {% if inv.status == 'Paid' %}
+                                <span class="badge bg-success">Paid</span>
+                            {% elif inv.status == 'Partial' %}
+                                <span class="badge bg-warning text-dark">Partial</span>
+                            {% else %}
+                                <span class="badge bg-danger">Unpaid</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">No fee invoices recorded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

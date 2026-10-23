@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white fw-bold">Add Department</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="mb-3">
+                        <label class="form-label">Department Name *</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Computer Science" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Save Department</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="fw-bold text-primary mb-3">Departments</h5>
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Department Name</th>
+                            <th>Faculty Count</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for d in departments %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td><strong>{{ d.name }}</strong></td>
+                            <td><span class="badge bg-info text-dark">{{ d.employees|length }} Members</span></td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">No departments created yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="text-primary fw-bold">Examination Marks Entry</h3>
+        <p class="text-muted">Select Class, Exam, and Subject to enter student marks.</p>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <form method="POST" action="" class="row align-items-end">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <label class="form-label fw-bold">Select Class</label>
+                <select name="class_id" class="form-select" required>
+                    <option value="">Choose Class...</option>
+                    {% for c in classes %}
+                        <option value="{{ c.id }}" {% if selected_class and selected_class.id == c.id %}selected{% endif %}>{{ c.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <label class="form-label fw-bold">Select Exam</label>
+                <select name="exam_id" class="form-select" required>
+                    <option value="">Choose Exam...</option>
+                    {% for e in exams %}
+                        <option value="{{ e.id }}" {% if selected_exam and selected_exam.id == e.id %}selected{% endif %}>{{ e.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3 mb-3 mb-md-0">
+                <label class="form-label fw-bold">Subject Name</label>
+                <input type="text" name="subject_name" class="form-control" value="{{ subject_name }}" placeholder="e.g. Mathematics" required>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">Fetch Students</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if selected_class and selected_exam %}
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white border-0 mt-2">
+        <h5 class="fw-bold text-primary mb-0">Entering Marks for {{ selected_class.name }} - {{ selected_exam.name }} (Subject: {{ subject_name }})</h5>
+    </div>
+    <div class="card-body">
+        {% if students %}
+        <form method="POST" action="">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <input type="hidden" name="class_id" value="{{ selected_class.id }}">
+            <input type="hidden" name="exam_id" value="{{ selected_exam.id }}">
+            <input type="hidden" name="subject_name" value="{{ subject_name }}">
+            
+            <div class="row mb-3 align-items-center">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Maximum Marks</label>
+                    <input type="number" step="0.5" name="max_marks" class="form-control" value="{{ max_marks }}" required>
+                </div>
+            </div>
+
+            <div class="table-responsive mb-4">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Adm No.</th>
+                            <th>Student Name</th>
+                            <th>Marks Obtained</th>
+                            <th>Report Card</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td><strong>{{ student.admission_number }}</strong></td>
+                            <td>{{ student.first_name }} {{ student.last_name }}</td>
+                            <td>
+                                <input type="number" step="0.5" name="mark_{{ student.id }}" class="form-control" style="max-width: 150px;" value="{{ existing_marks.get(student.id, '') }}" placeholder="0 - {{ max_marks }}" max="{{ max_marks }}">
+                            </td>
+                            <td>
+                                <a href="{{ url_for('exams.report_card', student_id=student.id, exam_id=selected_exam.id) }}" target="_blank" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-file-earmark-text"></i> View Marksheet
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" name="save_marks" value="true" class="btn btn-success px-5 fw-bold">
+                    <i class="bi bi-check-circle me-1"></i> Save Marks
+                </button>
+            </div>
+        </form>
+        {% else %}
+        <div class="alert alert-info text-center">
+            No active students found in this class.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

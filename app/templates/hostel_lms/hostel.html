@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white fw-bold">Add Hostel Building</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="form_type" value="add_hostel"/>
+                    <div class="mb-3">
+                        <label class="form-label">Hostel Name *</label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Tagore Hostel Block-A" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Hostel Type *</label>
+                        <select name="hostel_type" class="form-select" required>
+                            <option value="Boys">Boys Hostel</option>
+                            <option value="Girls">Girls Hostel</option>
+                            <option value="Co-ed">Co-ed</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Address / Location</label>
+                        <input type="text" name="address" class="form-control" placeholder="Campus North Wing">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Add Hostel</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-success text-white fw-bold">Add Room to Hostel</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="form_type" value="add_room"/>
+                    <div class="mb-3">
+                        <label class="form-label">Select Hostel *</label>
+                        <select name="hostel_id" class="form-select" required>
+                            {% for h in hostels %}
+                                <option value="{{ h.id }}">{{ h.name }} ({{ h.hostel_type }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Room No. *</label>
+                            <input type="text" name="room_number" class="form-control" placeholder="101" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Capacity (Beds)</label>
+                            <input type="number" name="capacity" class="form-control" value="2" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cost Per Bed (₹) *</label>
+                        <input type="number" step="0.01" name="cost_per_bed" class="form-control" placeholder="5000.00" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold">Add Room</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="fw-bold text-primary mb-3">Hostel Rooms Directory</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Hostel Name</th>
+                                <th>Room No</th>
+                                <th>Capacity</th>
+                                <th>Rent / Bed</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in rooms %}
+                            <tr>
+                                <td><strong>{{ r.hostel.name }}</strong> ({{ r.hostel.hostel_type }})</td>
+                                <td><span class="badge bg-secondary">Room {{ r.room_number }}</span></td>
+                                <td>{{ r.capacity }} Beds</td>
+                                <td class="text-success fw-bold">₹{{ r.cost_per_bed }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center text-muted">No hostel rooms created yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

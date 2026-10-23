@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white fw-bold">Assign Student to Route</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Student Admission Number *</label>
+                        <input type="text" name="admission_number" class="form-control" placeholder="e.g. 01" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Select Route *</label>
+                        <select name="route_id" class="form-select" required>
+                            <option value="">Choose Route...</option>
+                            {% for r in routes %}
+                                <option value="{{ r.id }}">{{ r.route_title }} (₹{{ r.monthly_fare }}/mo)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Confirm Allocation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="fw-bold text-primary mb-3">Transport Allocated Students</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Adm No</th>
+                                <th>Student Name</th>
+                                <th>Class</th>
+                                <th>Assigned Route</th>
+                                <th>Monthly Fare</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for alloc in allocations %}
+                            <tr>
+                                <td><strong>{{ alloc.student.admission_number }}</strong></td>
+                                <td>{{ alloc.student.first_name }} {{ alloc.student.last_name }}</td>
+                                <td>{{ alloc.student.course_class.name if alloc.student.course_class else 'N/A' }}</td>
+                                <td><span class="badge bg-secondary">{{ alloc.route.route_title }}</span></td>
+                                <td class="text-success fw-bold">₹{{ alloc.route.monthly_fare }}</td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="5" class="text-center text-muted">No students currently allocated to transport.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

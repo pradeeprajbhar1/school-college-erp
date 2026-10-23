@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <!-- Add Vehicle Form -->
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-primary text-white fw-bold">Add Bus / Vehicle</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="action_type" value="add_vehicle"/>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Vehicle Registration No. *</label>
+                        <input type="text" name="vehicle_number" class="form-control" placeholder="e.g. UP32-AB-1234" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Driver Name *</label>
+                        <input type="text" name="driver_name" class="form-control" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Driver Phone *</label>
+                            <input type="text" name="driver_phone" class="form-control" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Seating Capacity</label>
+                            <input type="number" name="capacity" class="form-control" value="40" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Save Vehicle</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Add Route Form -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-success text-white fw-bold">Create Transport Route</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <input type="hidden" name="action_type" value="add_route"/>
+
+                    <div class="mb-3">
+                        <label class="form-label">Route Title *</label>
+                        <input type="text" name="route_title" class="form-control" placeholder="e.g. Route 1: Charbagh to Campus" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Assign Vehicle</label>
+                        <select name="vehicle_id" class="form-select">
+                            <option value="">Select Bus/Vehicle...</option>
+                            {% for v in vehicles %}
+                                <option value="{{ v.id }}">{{ v.vehicle_number }} (Driver: {{ v.driver_name }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Start Point</label>
+                            <input type="text" name="start_point" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">End Point</label>
+                            <input type="text" name="end_point" class="form-control">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Monthly Fare (₹) *</label>
+                        <input type="number" step="0.01" name="monthly_fare" class="form-control" placeholder="1200.00" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Save Route</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Directory Listing -->
+    <div class="col-md-7 mb-4">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h5 class="fw-bold text-primary mb-3">Configured Routes</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Route Title</th>
+                                <th>Vehicle</th>
+                                <th>Fare</th>
+                                <th>Students</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in routes %}
+                            <tr>
+                                <td><strong>{{ r.route_title }}</strong><br><small class="text-muted">{{ r.start_point }} to {{ r.end_point }}</small></td>
+                                <td>{{ r.vehicle.vehicle_number if r.vehicle else 'Unassigned' }}</td>
+                                <td class="text-success fw-bold">₹{{ r.monthly_fare }} / mo</td>
+                                <td><span class="badge bg-info text-dark">{{ r.assigned_students|length }} Allocated</span></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center text-muted">No transport routes configured yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="fw-bold text-primary mb-3">Bus / Vehicle Fleet</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Vehicle No.</th>
+                                <th>Driver</th>
+                                <th>Contact</th>
+                                <th>Capacity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for v in vehicles %}
+                            <tr>
+                                <td><strong>{{ v.vehicle_number }}</strong></td>
+                                <td>{{ v.driver_name }}</td>
+                                <td>{{ v.driver_phone }}</td>
+                                <td><span class="badge bg-secondary">{{ v.capacity }} Seats</span></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center text-muted">No vehicles added yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

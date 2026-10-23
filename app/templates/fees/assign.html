@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold text-primary mb-0">Assign Fees & Send Reminders</h3>
+        <p class="text-muted small mb-0">Manage fee structures and send automated payment alerts to parents.</p>
+    </div>
+    <form method="POST" action="{{ url_for('fees.send_fee_reminders') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <button type="submit" class="btn btn-warning fw-bold">
+            <i class="bi bi-broadcast me-1"></i> Send Pending Fee WhatsApp/SMS Alerts
+        </button>
+    </form>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+        <form method="POST" action="">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Select Class</label>
+                    <select name="class_id" class="form-select" required>
+                        <option value="">Choose Class...</option>
+                        {% for c in classes %}
+                            <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Select Fee Category</label>
+                    <select name="category_id" class="form-select" required>
+                        <option value="">Choose Fee...</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}">{{ cat.name }} (₹{{ cat.default_amount }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Due Date</label>
+                    <input type="date" name="due_date" class="form-control" required>
+                </div>
+            </div>
+            <div class="text-end mt-4">
+                <button type="submit" class="btn btn-success px-5 fw-bold">
+                    <i class="bi bi-receipt me-1"></i> Generate Invoices
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

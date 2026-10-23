@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold text-primary">Parent / Guardian Portal</h2>
+        <p class="text-muted">Tracking Ward Performance & School Updates</p>
+    </div>
+</div>
+
+{% for child in children %}
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3">
+        <h5 class="mb-0 fw-bold"><i class="bi bi-person-fill me-2"></i>{{ child.first_name }} {{ child.last_name }}</h5>
+        <span class="badge bg-light text-dark">Adm No: {{ child.admission_number }} | Class: {{ child.course_class.name if child.course_class else 'N/A' }}</span>
+    </div>
+    <div class="card-body p-4">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="border rounded p-3 text-center bg-light">
+                    <h6 class="text-muted">Status</h6>
+                    <span class="badge bg-success fs-6">{{ child.status }}</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border rounded p-3 text-center bg-light">
+                    <h6 class="text-muted">Total Recorded Invoices</h6>
+                    <h4 class="fw-bold text-primary">{{ child.invoices|length }}</h4>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="border rounded p-3 text-center bg-light">
+                    <h6 class="text-muted">Exam Records</h6>
+                    <h4 class="fw-bold text-info">{{ child.exam_marks|length }} Subjects</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info text-center py-4">
+    No children/wards currently linked to this guardian account. Contact the school administrator.
+</div>
+{% endif %}
+{% endblock %}

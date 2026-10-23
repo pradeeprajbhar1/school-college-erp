@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="text-primary fw-bold mb-0">Pending Registration Approvals</h3>
+        <p class="text-muted small">Verify and approve self-registered Students, Teachers, and Parents.</p>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Email</th>
+                        <th>Requested Role</th>
+                        <th>Registered Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><strong>{{ user.email }}</strong></td>
+                        <td>
+                            {% for role in user.roles %}
+                                <span class="badge bg-info text-dark">{{ role.name.upper() }}</span>
+                            {% endfor %}
+                        </td>
+                        <td>{{ user.created_at.strftime('%d %b %Y, %I:%M %p') }}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <form method="POST" action="{{ url_for('auth.approve_user', user_id=user.id) }}">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-sm btn-success fw-bold">
+                                        <i class="bi bi-check-circle me-1"></i> Approve
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('auth.reject_user', user_id=user.id) }}" onsubmit="return confirm('Are you sure you want to reject this request?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-x-circle me-1"></i> Reject
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4 text-muted">No pending registration requests found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

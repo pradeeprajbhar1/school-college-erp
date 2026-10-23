@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold text-primary">Teacher Portal</h2>
+        <p class="text-muted">Welcome, <strong>{{ employee.first_name }} {{ employee.last_name }}</strong> ({{ employee.designation }})</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 bg-primary text-white p-3">
+            <h6>Department</h6>
+            <h4>{{ employee.department.name if employee.department else 'General' }}</h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 bg-success text-white p-3">
+            <h6>Employee Code</h6>
+            <h4>{{ employee.employee_code }}</h4>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 bg-info text-white p-3">
+            <h6>Assigned Classes/Periods</h6>
+            <h4>{{ assigned_slots|length }} Slots</h4>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white fw-bold text-primary">Quick Teacher Actions</div>
+    <div class="card-body d-flex gap-3">
+        <a href="{{ url_for('attendance.take_attendance') }}" class="btn btn-outline-primary"><i class="bi bi-calendar-check me-1"></i> Mark Student Attendance</a>
+        <a href="{{ url_for('exams.enter_marks') }}" class="btn btn-outline-success"><i class="bi bi-pen me-1"></i> Enter Exam Marks</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white fw-bold text-primary">My Weekly Schedule Grid</div>
+    <div class="card-body">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Day</th>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th>Timing</th>
+                    <th>Room</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for slot in assigned_slots %}
+                <tr>
+                    <td><strong>{{ slot.day_of_week }}</strong></td>
+                    <td>{{ slot.course_class.name }}</td>
+                    <td>{{ slot.subject_name }}</td>
+                    <td>{{ slot.start_time }} - {{ slot.end_time }}</td>
+                    <td><span class="badge bg-secondary">{{ slot.room_number or 'N/A' }}</span></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No timetable slots assigned yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

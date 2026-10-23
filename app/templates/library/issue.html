@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-success text-white fw-bold">Issue Book to Student</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Select Available Book</label>
+                        <select name="book_id" class="form-select" required>
+                            <option value="">Choose Book...</option>
+                            {% for b in books %}
+                                <option value="{{ b.id }}">{{ b.title }} (by {{ b.author }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Student Admission Number</label>
+                        <input type="text" name="admission_number" class="form-control" placeholder="e.g. 01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Issue Duration (Days)</label>
+                        <input type="number" name="days" class="form-control" value="14" min="1" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Confirm Issue</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="fw-bold text-primary mb-3">Currently Issued Books</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Book Title</th>
+                                <th>Issued To</th>
+                                <th>Issue Date</th>
+                                <th>Due Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in issued_records %}
+                            <tr>
+                                <td><strong>{{ record.book.title }}</strong></td>
+                                <td>{{ record.student.first_name }} {{ record.student.last_name }} ({{ record.student.admission_number }})</td>
+                                <td>{{ record.issue_date.strftime('%d %b %Y') }}</td>
+                                <td class="text-danger fw-bold">{{ record.due_date.strftime('%d %b %Y') }}</td>
+                                <td>
+                                    <form method="POST" action="{{ url_for('library.return_book', issue_id=record.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Return Book</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="5" class="text-center text-muted">No books currently issued.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

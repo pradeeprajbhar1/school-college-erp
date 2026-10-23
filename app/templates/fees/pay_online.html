@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-md-7 col-lg-6">
+        <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h4 class="fw-bold mb-0"><i class="bi bi-qr-code-scan me-2"></i>Online Fee Payment</h4>
+            </div>
+            <div class="card-body p-4">
+                
+                <!-- Fee Summary Box -->
+                <div class="p-3 bg-light rounded border mb-4 text-center">
+                    <p class="mb-1 text-muted">Category: <strong>{{ invoice.category.name }}</strong></p>
+                    <p class="mb-1 text-muted">Student Name: <strong>{{ invoice.student.first_name }} {{ invoice.student.last_name }}</strong> (Adm No: {{ invoice.student.admission_number }})</p>
+                    <h2 class="text-success fw-bold my-2">₹{{ amount_due }}</h2>
+                </div>
+
+                <!-- Payment Method Tabs -->
+                <ul class="nav nav-pills nav-justified mb-4" id="paymentTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active fw-bold" id="qr-tab" data-bs-toggle="tab" data-bs-target="#qr-payment" type="button" role="tab">
+                            <i class="bi bi-qr-code me-1"></i> Scan & Pay UPI QR
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link fw-bold" id="razorpay-tab" data-bs-toggle="tab" data-bs-target="#razorpay-payment" type="button" role="tab">
+                            <i class="bi bi-credit-card me-1"></i> Razorpay Gateway
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="paymentTabsContent">
+                    
+                    <!-- TAB 1: CUSTOM STATIC UPI QR SCANNER -->
+                    <div class="tab-pane fade show active text-center" id="qr-payment" role="tabpanel">
+                        <p class="text-muted small mb-2">Scan using PhonePe, Google Pay, Paytm, or BHIM UPI App</p>
+                        
+                        <!-- Custom QR Code Image Display -->
+                        <div class="d-flex justify-content-center my-3">
+                            <div class="p-2 bg-white border rounded shadow-sm">
+                                <img src="{{ url_for('static', filename='images/school_qr.png') }}" alt="School UPI QR Code" style="max-width: 220px; height: auto;" class="img-fluid rounded">
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info py-2 small mb-3">
+                            <i class="bi bi-info-circle me-1"></i> Pay exact amount <strong>₹{{ amount_due }}</strong> on the QR code above.
+                        </div>
+
+                        <!-- UTR Entry Form after Scanning -->
+                        <form action="{{ url_for('fees.submit_upi_qr') }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="invoice_id" value="{{ invoice.id }}">
+                            
+                            <div class="mb-3 text-start">
+                                <label class="form-label fw-bold">Enter 12-Digit Transaction / UTR No. *</label>
+                                <input type="text" name="utr_number" class="form-control" placeholder="e.g. 428109384712" required pattern="[0-9A-Za-z]{6,20}">
+                                <small class="text-muted">Enter the UTR / Ref No. received in your UPI App after payment.</small>
+                            </div>
+
+                            <button type="submit" class="btn btn-success btn-lg w-100 fw-bold">
+                                <i class="bi bi-check-circle me-1"></i> Verify & Generate Fee Receipt
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- TAB 2: RAZORPAY GATEWAY -->
+                    <div class="tab-pane fade text-center py-4" id="razorpay-payment" role="tabpanel">
+                        <p class="text-muted mb-3">Pay securely using Credit Card, Debit Card, Netbanking, or Wallet</p>
+                        <form action="{{ url_for('fees.payment_callback') }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="invoice_id" value="{{ invoice.id }}">
+                            
+                            <script
+                                src="https://checkout.razorpay.com/v1/checkout.js"
+                                data-key="{{ razorpay_key }}"
+                                data-amount="{{ (amount_due * 100)|int }}"
+                                data-currency="INR"
+                                data-order_id="{{ order_id }}"
+                                data-buttontext="Proceed to Razorpay Checkout"
+                                data-name="{{ current_user.institution.name if current_user.institution else 'ERP System' }}"
+                                data-description="Fee Payment for {{ invoice.category.name }}"
+                                data-prefill.name="{{ invoice.student.first_name }} {{ invoice.student.last_name }}"
+                                data-prefill.email="{{ current_user.email }}"
+                                data-theme.color="#1a237e">
+                            </script>
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

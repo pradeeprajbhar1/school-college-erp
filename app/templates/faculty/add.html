@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="text-primary fw-bold">Add Faculty Member</h3>
+        <a href="{{ url_for('faculty.index') }}" class="text-decoration-none"><i class="bi bi-arrow-left"></i> Back to Directory</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body p-4">
+        <form method="POST" action="">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label class="form-label">Employee Code *</label>
+                    <input type="text" name="employee_code" class="form-control" placeholder="e.g. EMP-101" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">First Name *</label>
+                    <input type="text" name="first_name" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Last Name *</label>
+                    <input type="text" name="last_name" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Email Address *</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <label class="form-label">Department</label>
+                    <select name="department_id" class="form-select">
+                        <option value="">Select Department...</option>
+                        {% for d in departments %}
+                            <option value="{{ d.id }}">{{ d.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Designation *</label>
+                    <input type="text" name="designation" class="form-control" placeholder="e.g. Senior Lecturer" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Qualification</label>
+                    <input type="text" name="qualification" class="form-control" placeholder="e.g. M.Tech, Ph.D">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Contact Number</label>
+                    <input type="text" name="contact_number" class="form-control">
+                </div>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary px-4">Save Faculty Member</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

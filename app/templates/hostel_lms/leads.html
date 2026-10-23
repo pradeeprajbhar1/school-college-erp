@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="fw-bold text-primary">Admission LMS & Lead Tracker</h3>
+        <p class="text-muted">Track and convert incoming online admission inquiries.</p>
+    </div>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Applicant Name</th>
+                        <th>Contact Info</th>
+                        <th>Course Applied</th>
+                        <th>Applied On</th>
+                        <th>Status</th>
+                        <th>Update Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for l in leads %}
+                    <tr>
+                        <td><strong>{{ l.applicant_name }}</strong></td>
+                        <td>
+                            <small class="d-block"><i class="bi bi-telephone me-1"></i> {{ l.phone }}</small>
+                            <small class="text-muted"><i class="bi bi-envelope me-1"></i> {{ l.email }}</small>
+                        </td>
+                        <td><span class="badge bg-info text-dark">{{ l.course_applied }}</span></td>
+                        <td><small>{{ l.applied_on.strftime('%d %b %Y, %I:%M %p') }}</small></td>
+                        <td>
+                            {% if l.status == 'Admitted' %}
+                                <span class="badge bg-success">Admitted</span>
+                            {% elif l.status == 'Contacted' %}
+                                <span class="badge bg-warning text-dark">Contacted</span>
+                            {% elif l.status == 'Rejected' %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% else %}
+                                <span class="badge bg-primary">New Inquiry</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="POST" action="" class="d-flex gap-1">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                <input type="hidden" name="lead_id" value="{{ l.id }}"/>
+                                <select name="status" class="form-select form-select-sm" style="width: 120px;">
+                                    <option value="New Inquiry" {% if l.status=='New Inquiry' %}selected{% endif %}>New</option>
+                                    <option value="Contacted" {% if l.status=='Contacted' %}selected{% endif %}>Contacted</option>
+                                    <option value="Admitted" {% if l.status=='Admitted' %}selected{% endif %}>Admitted</option>
+                                    <option value="Rejected" {% if l.status=='Rejected' %}selected{% endif %}>Rejected</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="6" class="text-center text-muted">No online admission inquiries received yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

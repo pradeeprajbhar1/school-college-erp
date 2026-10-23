@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white fw-bold">Allocate Hostel Room</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="mb-3">
+                        <label class="form-label">Select Student *</label>
+                        <select name="student_id" class="form-select" required>
+                            <option value="">Choose Student...</option>
+                            {% for s in students %}
+                                <option value="{{ s.id }}">{{ s.first_name }} {{ s.last_name }} ({{ s.admission_number }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select Room *</label>
+                        <select name="room_id" class="form-select" required>
+                            <option value="">Choose Room...</option>
+                            {% for r in rooms %}
+                                <option value="{{ r.id }}">{{ r.hostel.name }} - Room {{ r.room_number }} (₹{{ r.cost_per_bed }}/bed)</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Allocate Room</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="fw-bold text-primary mb-3">Active Room Allocations</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Hostel & Room</th>
+                                <th>Allocated Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in allocations %}
+                            <tr>
+                                <td><strong>{{ a.student.first_name }} {{ a.student.last_name }}</strong></td>
+                                <td>{{ a.room.hostel.name }} - Room {{ a.room.room_number }}</td>
+                                <td>{{ a.allocated_date.strftime('%d %b %Y') }}</td>
+                                <td><span class="badge bg-success">Active</span></td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="4" class="text-center text-muted">No students currently allocated to hostel.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

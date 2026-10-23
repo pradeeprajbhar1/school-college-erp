@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold text-primary">Student Dashboard</h2>
+        <p class="text-muted">Welcome, <strong>{{ student.first_name }} {{ student.last_name }}</strong> (Adm No: {{ student.admission_number }})</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 p-3 bg-white border-start border-primary border-4">
+            <small class="text-muted fw-bold">Class & Section</small>
+            <h3 class="fw-bold text-primary mb-0">{{ student.course_class.name if student.course_class else 'N/A' }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 p-3 bg-white border-start border-success border-4">
+            <small class="text-muted fw-bold">Attendance Percentage</small>
+            <h3 class="fw-bold text-success mb-0">{{ attendance_pct }}%</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 p-3 bg-white border-start border-danger border-4">
+            <small class="text-muted fw-bold">Pending Fee Balance</small>
+            <h3 class="fw-bold text-danger mb-0">₹{{ total_due }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white fw-bold text-primary">Fee Dues Summary</div>
+            <div class="card-body">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Category</th>
+                            <th>Total</th>
+                            <th>Paid</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inv in invoices %}
+                        <tr>
+                            <td>{{ inv.category.name }}</td>
+                            <td>₹{{ inv.amount }}</td>
+                            <td class="text-success fw-bold">₹{{ inv.paid_amount }}</td>
+                            <td><span class="badge bg-{{ 'success' if inv.status=='Paid' else 'danger' }}">{{ inv.status }}</span></td>
+                            <td>
+                                {% if inv.status != 'Paid' %}
+                                    <a href="{{ url_for('fees.pay_online', invoice_id=inv.id) }}" class="btn btn-sm btn-success fw-bold">
+                                        <i class="bi bi-credit-card me-1"></i> Pay Online
+                                    </a>
+                                {% else %}
+                                    <span class="badge bg-light text-dark border">Paid</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5" class="text-center text-muted">No fee records found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white fw-bold text-primary">Recent Exam Marks</div>
+            <div class="card-body">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Subject</th>
+                            <th>Marks</th>
+                            <th>Max</th>
+                            <th>Report Card</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in exam_marks %}
+                        <tr>
+                            <td><strong>{{ m.subject_name }}</strong></td>
+                            <td class="fw-bold text-primary">{{ m.marks_obtained }}</td>
+                            <td>{{ m.max_marks }}</td>
+                            <td>
+                                <a href="{{ url_for('exams.report_card', student_id=student.id, exam_id=m.exam_id) }}" target="_blank" class="btn btn-sm btn-outline-info">View Card</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="4" class="text-center text-muted">No exam marks uploaded yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="fw-bold text-primary"><i class="bi bi-bell-fill me-2"></i>Digital Notice Board & Events</h2>
+        <p class="text-muted">Stay updated with official institution announcements and upcoming calendar events.</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Active Notices Column -->
+    <div class="col-md-7 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-primary text-white fw-bold">
+                <i class="bi bi-pin-angle-fill me-2"></i>Official Circulars & Notices
+            </div>
+            <div class="card-body p-4">
+                {% for n in notices %}
+                <div class="border-bottom pb-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="fw-bold text-primary mb-0">{{ n.title }}</h5>
+                        <span class="badge bg-light text-dark border"><i class="bi bi-people me-1"></i> {{ n.target_audience }}</span>
+                    </div>
+                    <p class="text-secondary mb-2">{{ n.content }}</p>
+                    <small class="text-muted"><i class="bi bi-clock me-1"></i> Posted: {{ n.posted_date.strftime('%d %b %Y, %I:%M %p') }}</small>
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-info-circle display-4 d-block mb-2 text-secondary"></i>
+                    No notices published at the moment.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Events Column -->
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-success text-white fw-bold">
+                <i class="bi bi-calendar3 me-2"></i>Upcoming School Events
+            </div>
+            <div class="card-body p-4">
+                {% for e in events %}
+                <div class="p-3 mb-3 rounded border border-start border-4 border-success bg-light">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h6 class="fw-bold mb-0 text-success">{{ e.title }}</h6>
+                        <span class="badge bg-success">{{ e.event_date.strftime('%d %b %Y') }}</span>
+                    </div>
+                    {% if e.venue %}<small class="d-block text-muted"><i class="bi bi-geo-alt me-1"></i> Venue: {{ e.venue }} ({{ e.start_time or 'All Day' }})</small>{% endif %}
+                    {% if e.description %}<p class="small text-secondary mt-2 mb-0">{{ e.description }}</p>{% endif %}
+                </div>
+                {% else %}
+                <div class="text-center text-muted py-5">
+                    <i class="bi bi-calendar-x display-4 d-block mb-2 text-secondary"></i>
+                    No upcoming events scheduled.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

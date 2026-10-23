@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h3 class="fw-bold text-primary">Manage Classes</h3>
+        <p class="text-muted">Add or manage academic classes for your institution.</p>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Add Class Form -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white fw-bold">
+                <i class="bi bi-plus-circle me-1"></i> Add New Class
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('academic.manage_classes') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Class Name *</label>
+                        <input type="text" name="class_name" class="form-control" placeholder="e.g., Class 10 or B.Tech CS" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">
+                        <i class="bi bi-save me-1"></i> Save Class
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Classes Table -->
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h5 class="fw-bold text-primary mb-3">Available Classes</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 10%;">#</th>
+                                <th>CLASS NAME</th>
+                                <th style="width: 20%;" class="text-center">ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in classes %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td><strong>{{ c.name }}</strong></td>
+                                <td class="text-center">
+                                    <form method="POST" action="{{ url_for('academic.delete_class', class_id=c.id) }}" onsubmit="return confirm('Are you sure you want to delete this class?');" style="display: inline;">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                        <button type="submit" class="btn btn-danger btn-sm" title="Delete Class">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-3">No classes added yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

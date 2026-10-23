@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white fw-bold">Add Timetable Slot</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="mb-3">
+                        <label class="form-label">Class *</label>
+                        <select name="class_id" class="form-select" required>
+                            <option value="">Choose Class...</option>
+                            {% for c in classes %}
+                                <option value="{{ c.id }}">{{ c.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Subject Name *</label>
+                        <input type="text" name="subject_name" class="form-control" placeholder="e.g. Mathematics" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Assign Teacher</label>
+                        <select name="teacher_id" class="form-select">
+                            <option value="">Select Teacher...</option>
+                            {% for t in teachers %}
+                                <option value="{{ t.id }}">{{ t.first_name }} {{ t.last_name }} ({{ t.designation }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Day of Week *</label>
+                        <select name="day_of_week" class="form-select" required>
+                            <option value="Monday">Monday</option>
+                            <option value="Tuesday">Tuesday</option>
+                            <option value="Wednesday">Wednesday</option>
+                            <option value="Thursday">Thursday</option>
+                            <option value="Friday">Friday</option>
+                            <option value="Saturday">Saturday</option>
+                        </select>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Start Time</label>
+                            <input type="text" name="start_time" class="form-control" placeholder="09:00 AM" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">End Time</label>
+                            <input type="text" name="end_time" class="form-control" placeholder="09:45 AM" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Room Number</label>
+                        <input type="text" name="room_number" class="form-control" placeholder="e.g. Room 102">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Add Slot</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="fw-bold text-primary mb-3">Class Timetables Directory</h5>
+                <p class="text-muted small">Select a class to view its full weekly schedule grid.</p>
+                <div class="list-group mb-4">
+                    {% for c in classes %}
+                        <a href="{{ url_for('timetable.view_class_timetable', class_id=c.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-calendar3 me-2 text-primary"></i> <strong>{{ c.name }}</strong>
+                            </div>
+                            <span class="btn btn-sm btn-outline-primary">View Timetable Grid</span>
+                        </a>
+                    {% else %}
+                        <p class="text-muted">No classes available.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

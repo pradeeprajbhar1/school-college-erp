@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white fw-bold">Process Salary & Generate Slip</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Select Faculty / Staff *</label>
+                        <select name="employee_id" class="form-select" required>
+                            <option value="">Choose Employee...</option>
+                            {% for e in employees %}
+                                <option value="{{ e.id }}">{{ e.first_name }} {{ e.last_name }} ({{ e.employee_code }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Month & Year *</label>
+                        <input type="text" name="month_year" class="form-control" placeholder="e.g. October 2026" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Basic Salary (₹) *</label>
+                        <input type="number" step="0.01" name="basic_salary" class="form-control" placeholder="30000.00" required>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label">Allowances (₹)</label>
+                            <input type="number" step="0.01" name="allowances" class="form-control" value="0.00">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Deductions (₹)</label>
+                            <input type="number" step="0.01" name="deductions" class="form-control" value="0.00">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 fw-bold">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> Process & Generate Payslip
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="fw-bold text-primary mb-3">Processed Salary Register</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Employee</th>
+                                <th>Month</th>
+                                <th>Basic</th>
+                                <th>Net Salary</th>
+                                <th>Paid Date</th>
+                                <th>Payslip</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in payrolls %}
+                            <tr>
+                                <td><strong>{{ p.employee.first_name }} {{ p.employee.last_name }}</strong></td>
+                                <td>{{ p.month_year }}</td>
+                                <td>₹{{ p.basic_salary }}</td>
+                                <td class="text-success fw-bold">₹{{ p.net_salary }}</td>
+                                <td>{{ p.payment_date.strftime('%d %b %Y') }}</td>
+                                <td>
+                                    <a href="{{ url_for('payroll.view_payslip', id=p.id) }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-printer me-1"></i> View Payslip
+                                    </a>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6" class="text-center text-muted">No payroll slips processed yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

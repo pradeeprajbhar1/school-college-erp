@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    {% if not is_admin and employee %}
+    <!-- Apply Leave Form for Teacher -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white fw-bold">Apply for Leave</div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <div class="mb-3">
+                        <label class="form-label">Leave Type *</label>
+                        <select name="leave_type" class="form-select" required>
+                            <option value="Casual Leave">Casual Leave (CL)</option>
+                            <option value="Sick Leave">Sick Leave (SL)</option>
+                            <option value="Earned Leave">Earned Leave (EL)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Start Date *</label>
+                        <input type="date" name="start_date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">End Date *</label>
+                        <input type="date" name="end_date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Reason *</label>
+                        <textarea name="reason" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Submit Leave Application</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="col-md-{{ '8' if (not is_admin and employee) else '12' }}">
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="fw-bold text-primary mb-3">{{ 'Faculty Leave Requests (Admin Approval)' if is_admin else 'My Leave Applications' }}</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                {% if is_admin %}<th>Employee</th>{% endif %}
+                                <th>Type</th>
+                                <th>From - To</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                {% if is_admin %}<th>Action</th>{% endif %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for l in leaves %}
+                            <tr>
+                                {% if is_admin %}<td><strong>{{ l.employee.first_name }} {{ l.employee.last_name }}</strong> ({{ l.employee.employee_code }})</td>{% endif %}
+                                <td><span class="badge bg-secondary">{{ l.leave_type }}</span></td>
+                                <td>{{ l.start_date.strftime('%d %b') }} to {{ l.end_date.strftime('%d %b %Y') }}</td>
+                                <td><small class="text-muted">{{ l.reason }}</small></td>
+                                <td>
+                                    {% if l.status == 'Approved' %}
+                                        <span class="badge bg-success">Approved</span>
+                                    {% elif l.status == 'Rejected' %}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">Pending</span>
+                                    {% endif %}
+                                </td>
+                                {% if is_admin %}
+                                <td>
+                                    {% if l.status == 'Pending' %}
+                                    <div class="d-flex gap-1">
+                                        <form method="POST" action="{{ url_for('payroll.approve_leave', id=l.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                            <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('payroll.reject_leave', id=l.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Reject</button>
+                                        </form>
+                                    </div>
+                                    {% else %}
+                                        <small class="text-muted">Processed</small>
+                                    {% endif %}
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="{{ '6' if is_admin else '5' }}" class="text-center text-muted">No leave requests found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

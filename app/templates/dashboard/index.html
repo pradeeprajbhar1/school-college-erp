@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+        <h2 class="fw-bold text-primary mb-1">Welcome, {{ current_user.username }}!</h2>
+        <p class="text-muted mb-0">Overview & Real-time Analytics for <strong>{{ current_user.institution.name }}</strong></p>
+    </div>
+    <div class="col-md-4 text-end">
+        <span class="badge bg-light text-dark border p-2"><i class="bi bi-calendar-event me-1"></i> Today: {{ today_date if today_date else '' }}</span>
+    </div>
+</div>
+
+<!-- Stat Cards Row -->
+<div class="row mb-4">
+    <!-- Active Students -->
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted fw-semibold">Active Students</h6>
+                        <h2 class="fw-bold mb-0 text-primary">{{ total_students }}</h2>
+                    </div>
+                    <div class="fs-1 text-primary opacity-50"><i class="bi bi-people-fill"></i></div>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 py-2">
+                <small class="text-muted"><a href="{{ url_for('students.index') }}" class="text-decoration-none">View Directory &rarr;</a></small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Faculty -->
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0 border-start border-info border-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted fw-semibold">Faculty / Teachers</h6>
+                        <h2 class="fw-bold mb-0 text-info">{{ total_teachers }}</h2>
+                    </div>
+                    <div class="fs-1 text-info opacity-50"><i class="bi bi-person-badge-fill"></i></div>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 py-2">
+                <small class="text-muted"><a href="{{ url_for('faculty.index') }}" class="text-decoration-none">View Staff &rarr;</a></small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Attendance % -->
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0 border-start border-warning border-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted fw-semibold">Today's Attendance</h6>
+                        <h2 class="fw-bold mb-0 text-warning">{{ attendance_pct }}%</h2>
+                    </div>
+                    <div class="fs-1 text-warning opacity-50"><i class="bi bi-calendar-check-fill"></i></div>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 py-2">
+                <small class="text-muted"><a href="{{ url_for('attendance.take_attendance') }}" class="text-decoration-none">Mark Attendance &rarr;</a></small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fee Collection -->
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm border-0 border-start border-success border-4 h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted fw-semibold">Collected Fees</h6>
+                        <h2 class="fw-bold mb-0 text-success">₹{{ total_collected_fees }}</h2>
+                    </div>
+                    <div class="fs-1 text-success opacity-50"><i class="bi bi-cash-stack"></i></div>
+                </div>
+            </div>
+            <div class="card-footer bg-white border-0 py-2">
+                <small class="text-danger fw-semibold">Pending Dues: ₹{{ total_pending_fees }}</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Section -->
+<div class="row mb-4">
+    <!-- Class-wise Distribution Chart -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 pt-3">
+                <h5 class="fw-bold text-primary mb-0"><i class="bi bi-pie-chart-fill me-2"></i>Class-wise Student Distribution</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="classChart" style="max-height: 280px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fee Financial Summary Chart -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white border-0 pt-3">
+                <h5 class="fw-bold text-primary mb-0"><i class="bi bi-bar-chart-line-fill me-2"></i>Financial Overview</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="feeChart" style="max-height: 280px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Transactions Widget -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white border-0 pt-3">
+                <h5 class="fw-bold text-primary mb-0"><i class="bi bi-clock-history me-2"></i>Recent Fee Payments</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Receipt #</th>
+                                <th>Student Name</th>
+                                <th>Category</th>
+                                <th>Amount Paid</th>
+                                <th>Payment Mode</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in recent_payments %}
+                            <tr>
+                                <td><strong>#RCPT-{{ p.id }}</strong></td>
+                                <td>{{ p.invoice.student.first_name }} {{ p.invoice.student.last_name }}</td>
+                                <td>{{ p.invoice.category.name }}</td>
+                                <td class="text-success fw-bold">₹{{ p.amount_paid }}</td>
+                                <td><span class="badge bg-light text-dark border">{{ p.payment_method }}</span></td>
+                                <td>{{ p.payment_date.strftime('%d %b %Y') }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-3">No payment transactions recorded yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Class Distribution Pie Chart
+        const classNames = {{ class_names | tojson }};
+        const classCounts = {{ class_student_counts | tojson }};
+        
+        const ctxClass = document.getElementById('classChart').getContext('2d');
+        new Chart(ctxClass, {
+            type: 'doughnut',
+            data: {
+                labels: classNames.length > 0 ? classNames : ['No Classes'],
+                datasets: [{
+                    data: classCounts.length > 0 ? classCounts : [1],
+                    backgroundColor: ['#1a237e', '#0d47a1', '#0288d1', '#009688', '#4caf50', '#ff9800']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // 2. Fee Financial Bar Chart
+        const totalCollected = {{ total_collected_fees }};
+        const totalPending = {{ total_pending_fees }};
+        
+        const ctxFee = document.getElementById('feeChart').getContext('2d');
+        new Chart(ctxFee, {
+            type: 'bar',
+            data: {
+                labels: ['Collected Fees', 'Pending Dues'],
+                datasets: [{
+                    label: 'Amount (In ₹)',
+                    data: [totalCollected, totalPending],
+                    backgroundColor: ['#2e7d32', '#c62828']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    });
+</script>
+{% endblock %}

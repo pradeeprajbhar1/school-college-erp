@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center my-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-lg border-0 rounded-3">
+            <div class="card-body p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold text-primary"><i class="bi bi-person-plus-fill me-2"></i>Create ERP Account</h3>
+                    <p class="text-muted small">Register as a Student, Teacher, or Parent</p>
+                </div>
+
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.role.label(class="form-label fw-bold") }}
+                        {{ form.role(class="form-select") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.full_name.label(class="form-label fw-bold") }}
+                        {{ form.full_name(class="form-control", placeholder="e.g. Rahul Sharma") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label fw-bold") }}
+                        {{ form.email(class="form-control", placeholder="name@example.com") }}
+                        {% for error in form.email.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Admission No. / Employee Code *</label>
+                        {{ form.identifier_code(class="form-control", placeholder="e.g. 01 for Student OR EMP-101 for Teacher") }}
+                        <small class="text-muted d-block mt-1">Students/Parents enter Admission No. Teachers enter Employee Code.</small>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label fw-bold") }}
+                        {{ form.password(class="form-control", placeholder="••••••••") }}
+                        {% for error in form.password.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.confirm_password.label(class="form-label fw-bold") }}
+                        {{ form.confirm_password(class="form-control", placeholder="••••••••") }}
+                        {% for error in form.confirm_password.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary btn-lg fw-bold") }}
+                    </div>
+                </form>
+
+                <hr class="my-4">
+
+                <div class="text-center">
+                    <p class="text-muted mb-0">Already have an account? <a href="{{ url_for('auth.login') }}" class="fw-bold text-primary text-decoration-none">Sign In Here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
